@@ -7,6 +7,33 @@ This version of siamFC incorporates a template update function that uses a model
 python siamese_tracking/run_webcam.py --arch SiamFCRes22 --resume snapshot/CIResNet22.pth
 ```
 
+
+This code is based on SiamDW - https://github.com/NelsonDaniel/SiamDW:
+
+```
+@InProceedings{SiamDW_2019_CVPR,
+author = {Zhang, Zhipeng and Peng, Houwen},
+title = {Deeper and Wider Siamese Networks for Real-Time Visual Tracking},
+booktitle = {The IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+month = {June},
+year = {2019}
+} 
+```
+
+AND UpdateNet - https://github.com/zhanglichao/updatenet:
+
+```
+@InProceedings{Zhang_2019_ICCV,
+author = {Zhang, Lichao and Gonzalez-Garcia, Abel and Weijer, Joost van de and Danelljan, Martin and Khan, Fahad Shahbaz},
+title = {Learning the Model Update for Siamese Trackers},
+booktitle = {The IEEE International Conference on Computer Vision (ICCV)},
+month = {October},
+year = {2019}
+} 
+```
+
+
+
 # Deeper and Wider Siamese Networks for Real-Time Visual Tracking
 We are hiring research interns for visual tracking and neural architecture search projects: houwen.peng@microsoft.com
 

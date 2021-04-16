@@ -4,6 +4,7 @@
 # Written by Houwen Peng and  Zhipeng Zhang
 # Email: houwen.peng@microsoft.com
 # siamfc class
+# some code is based on updatenet: https://github.com/zhanglichao/updatenet/
 # ------------------------------------------------------------------------------
 import cv2
 import numpy as np

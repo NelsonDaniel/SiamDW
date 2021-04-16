@@ -144,8 +144,6 @@ def main():
     info.epoch_test = True
     info.cls_type = 'thinner'
 
-    
-
     if 'FC' in args.arch:
         net = models.__dict__[args.arch]()
         tracker = SiamFC_Update(info)
@@ -163,7 +161,6 @@ def main():
     net = load_pretrain(net, args.resume)
     net.eval()
     net = net.cuda()
-
 
     track_webcam(tracker, net, updatenet)
 
