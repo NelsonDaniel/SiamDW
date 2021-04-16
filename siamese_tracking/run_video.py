@@ -22,6 +22,9 @@ from tracker.siamrpn import SiamRPN
 from easydict import EasyDict as edict
 from utils.utils import load_pretrain, cxy_wh_2_rect, get_axis_aligned_bbox, load_dataset, poly_iou
 
+from tracker.siamfc_update import SiamFC_Update
+
+from models.updatenet import UpdateResNet
 
 def parse_args():
     """
@@ -37,7 +40,7 @@ def parse_args():
     return args
 
 
-def track_video(tracker, model, video_path, init_box=None):
+def track_video(tracker, model, updatenet, video_path, init_box=None):
 
     assert os.path.isfile(video_path), "please provide a valid video file"
 
@@ -83,7 +86,7 @@ def track_video(tracker, model, video_path, init_box=None):
         frame_disp = frame.copy()
 
         # Draw box
-        state = tracker.track(state, frame_disp)  # track
+        state = tracker.track(state, frame_disp, updatenet)  # track
         location = cxy_wh_2_rect(state['target_pos'], state['target_sz'])
         x1, y1, x2, y2 = int(location[0]), int(location[1]), int(location[0] + location[2]), int(location[1] + location[3])
 
@@ -135,12 +138,17 @@ def main():
 
     if 'FC' in args.arch:
         net = models.__dict__[args.arch]()
-        tracker = SiamFC(info)
+        tracker = SiamFC_Update(info)
     else:
         net = models.__dict__[args.arch](anchors_nums=5, cls_type='thinner')
         tracker = SiamRPN(info)
 
     print('[*] ======= Track video with {} ======='.format(args.arch))
+
+    updatenet = UpdateResNet()
+    updatenet = load_pretrain(updatenet, 'snapshot/vot2016.pth.tar')
+    updatenet.eval()
+    updatenet = updatenet.cuda()
 
     net = load_pretrain(net, args.resume)
     net.eval()
@@ -152,7 +160,7 @@ def main():
     else:
         pass
 
-    track_video(tracker, net, args.video, init_box=args.init_bbox)
+    track_video(tracker, net, updatenet, args.video, init_box=args.init_bbox)
 
 if __name__ == '__main__':
     main()

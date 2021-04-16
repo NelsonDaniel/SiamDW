@@ -1,3 +1,12 @@
+# SiamFCDW_UPDATE
+
+This version of siamFC incorporates a template update function that uses a model that selects the best model. We used SiamDW as base code since it was well documented and it has a webcam tracking demo and a video tracking demo. To run the webcam demo use:
+
+
+```
+python siamese_tracking/run_webcam.py --arch SiamFCRes22 --resume snapshot/CIResNet22.pth
+```
+
 # Deeper and Wider Siamese Networks for Real-Time Visual Tracking
 We are hiring research interns for visual tracking and neural architecture search projects: houwen.peng@microsoft.com
 
