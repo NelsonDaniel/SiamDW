@@ -18,11 +18,13 @@ import models.models as models
 
 from os.path import exists, join
 from torch.autograd import Variable
+from tracker.siamfc_update import SiamFC_Update
 from tracker.siamfc import SiamFC
 from tracker.siamrpn import SiamRPN
 from easydict import EasyDict as edict
 from utils.utils import load_pretrain, cxy_wh_2_rect, get_axis_aligned_bbox, load_dataset, poly_iou
-
+ 
+from models.updatenet import UpdateResNet
 
 def parse_args():
     """
@@ -36,7 +38,7 @@ def parse_args():
     return args
 
 
-def track_webcam(tracker, model):
+def track_webcam(tracker, model, updatenet):
     """Run tracker with webcam."""
 
     class UIControl:
@@ -97,7 +99,7 @@ def track_webcam(tracker, model):
         if ui_control.mode == 'select':
             cv2.rectangle(frame_disp, ui_control.get_tl(), ui_control.get_br(), (255, 0, 0), 2)
         elif ui_control.mode == 'track':
-            state = tracker.track(state, frame_disp)  # track
+            state = tracker.track(state, frame_disp, updatenet)  # track
             location = cxy_wh_2_rect(state['target_pos'], state['target_sz'])
             x1, y1, x2, y2 = int(location[0]), int(location[1]), int(location[0] + location[2]), int(
                 location[1] + location[3])
@@ -142,21 +144,28 @@ def main():
     info.epoch_test = True
     info.cls_type = 'thinner'
 
+    
+
     if 'FC' in args.arch:
         net = models.__dict__[args.arch]()
-        tracker = SiamFC(info)
+        tracker = SiamFC_Update(info)
     else:
         net = models.__dict__[args.arch](anchors_nums=5, cls_type='thinner')
         tracker = SiamRPN(info)
 
     print('[*] ======= Track video with {} ======='.format(args.arch))
 
+    updatenet = UpdateResNet()
+    updatenet = load_pretrain(updatenet, 'snapshot/vot2016.pth.tar')
+    updatenet.eval()
+    updatenet = updatenet.cuda()
+
     net = load_pretrain(net, args.resume)
     net.eval()
     net = net.cuda()
 
 
-    track_webcam(tracker, net)
+    track_webcam(tracker, net, updatenet)
 
 if __name__ == '__main__':
     main()
